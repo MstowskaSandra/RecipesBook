@@ -1,5 +1,34 @@
+<div class="rating"  data-recipe-id="${recipe.id}"></div>
 
-let recipesAPI ="https://dummyjson.com/recipes";
+
+
+recipes.forEach(recipe => {
+    const recipeElement = document.createElement('div');
+    recipeElement.classList.add('recipe');
+    recipeElement.innerHTML= `
+    <img src= "${recipe.image}" alt= "${recipe.name}">
+       <h2>${recipe.name}</h2>
+       <h3><strong>Cook time: </strong>${recipe.cookTimeMinutes}min</h3>
+       <p><strong>Incredients:</strong>${recipe.ingredients} <br><br>
+       <strong>Instructions: </strong> ${recipe.instructions}</p>
+       <div class="rating"  data-recipe-id="${recipe.id}"></div>
+
+
+
+       /*function rateRecipe(recipeId, rating) {
+        const stars = document.querySelectorAll(`.rating[data-recipe-id= "${recipeId}"] .star`);
+    
+        stars.forEach((star, index)  => {
+            star.classList.toggle('selected', index < rating);
+        });
+    }*/
+
+
+
+
+    tuuuuuuuuuuuuuuuuu
+
+    let recipesAPI ="https://dummyjson.com/recipes";
 let recipes= [];
 
 fetch(recipesAPI)
@@ -7,11 +36,6 @@ fetch(recipesAPI)
 .then(data => {
     recipes = data.recipes;
 })
-
-let ratings = {};
-function rateRecipe(recipeId, rating) {
-    ratings[recipeId] = rating;
-}
 
 function displayRecipies(recipes) {
     const recipeContainer = document.querySelector('#recipeContainer');
@@ -35,11 +59,38 @@ function displayRecipies(recipes) {
         `;
         recipeContainer.appendChild(recipeElement);
 
+        const ratingContainer = recipeElement.querySelector('.rating');
+
+        Array.from({length: 5}).map((_, index) => {
+            const star = document.createElement('span');
+            star.classList.add('star');
+            star.innerHTML = '★';
+            star.dataset.value = index + 1;
+
+            star.addEventListener('click', ()  => rateRecipe(recipe.id, star.dataset.value));
+            ratingContainer.appendChild(star);
+        });
         console.log(recipe);
         recipeElement.addEventListener('click', () => showRecipeDetails(recipe));
     });      
 }
 
+function rateRecipe(recipeId, rating) {
+    const stars = document.querySelectorAll(`.rating[data-recipe-id= "${recipeId}"] .star`);
+
+    stars.forEach((star, index)  => {
+        star.classList.toggle('selected', index < rating);
+    });
+}
+let ratings = {};
+
+function rateRecipe(recipeId, ratings) {
+    const stars = document.querySelectorAll(`.rating[data-recipe-id= "${recipeId}"] .star`);
+
+    stars.forEach((star, index)  => {
+        star.classList.toggle('selected', index < ratings);
+    });
+}
 function showRecipeDetails(recipe) {
     const recipeContainer = document.querySelector('#recipeContainer');
     recipeContainer.innerHTML = `
@@ -48,43 +99,18 @@ function showRecipeDetails(recipe) {
        <h3><strong>Cook time:</strong> ${recipe.cookTimeMinutes} min</h3>
        <p><strong>Ingredients:</strong> ${recipe.ingredients}  <br><br>
        <strong>Instructions: </strong> ${recipe.instructions}</p>
-       <div class="rating"  data-recipe-id="${recipe.id}"></div>
     `;
 
     const storedRating = ratings[recipe.id] || 0;
-    displayRating(recipe.id, storedRating);
+    rateRecipe(recipe.id, storedRating);
 
     const backButton = document.querySelector('#backButton');
     backButton.style.display = 'block';
     backButton.onclick = backToStart;
    
     document.querySelector('#searchButton').style.display = 'none';
+
 }
-
-function displayRating(recipeId, rating) {
-    const ratingContainer = document.querySelector(`.rating[data-recipe-id= "${recipeId}"]`);
-    ratingContainer.innerHTML = '';
-
-    Array.from({length: 5}).forEach((_, index) => {
-        const star = document.createElement('span');
-        star.classList.add('star');
-        star.innerHTML = '★';
-        star.dataset.value =  index + 1;
-
-        star.addEventListener('click', ()  => {
-            rateRecipe(recipeId, star.dataset.value);
-            displayRating(recipeId, star.dataset.value); 
-    });
-
-    ratingContainer.appendChild(star);
-});
-
-const stars = ratingContainer.querySelectorAll('.star');
-stars.forEach((star, index) => {
-    star.classList.toggle('selected', index < rating);
-});
-}
-
 document.addEventListener('DOMContentLoaded', () => {
     const backButton = document.querySelector('#backButton');
     console.log(backButton);
@@ -97,6 +123,8 @@ function backToStart() {
     
     const searchContainer= document.querySelector('#container');
     container.style.display = 'block';
+
+    /*displayRecipies(recipes);*/
 
     document.querySelector('#searchButton').style.display = 'block';
 
@@ -119,6 +147,4 @@ function searchRecipes() {
 }
 
 document.querySelector('#searchButton').addEventListener('click', searchRecipes);
-
-
 
